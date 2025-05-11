@@ -1,32 +1,42 @@
-const express = require("express");
+import express from "express";
+import { JWT_SECRET } from "./config.js";
+
+import jwt from "jsonwebtoken";
+import { jwtAuthMiddleware } from "./middlewares/jwtAuthMiddleware.js";
+import { methodsMiddlewares } from "./middlewares/methodsMiddlewares.js";
+
 const app = express();
-const jwt = require("jsonwebtoken");
-const JWT_SECRET = "adityahadmadec";
+
+
 
 app.use(express.json());
 
 const database = [];
 
-function signupHandler(req, res) {
+app.use(jwtAuthMiddleware);
+
+app.use(methodsMiddlewares);
+
+app.post("/signup", function (req, res) {
   const { username, password } = req.body;
 
   if (database.find((d) => d.username === username)) {
-    res.json({
+    return res.json({
       message: "You Are Already Signed up Man !!!",
     });
   }
+
   database.push({
     username: username,
     password: password,
   });
 
-  console.log(database);
+  // console.log(database);
   res.json({
     message: "You Are Signed In .",
   });
-}
-
-function signinpHandler(req, res) {
+});
+app.post("/signin", function (req, res) {
   const username = req.body.username;
   const password = req.body.password;
 
@@ -45,7 +55,7 @@ function signinpHandler(req, res) {
       JWT_SECRET
     );
 
-    console.log(database);
+    // console.log(database);
     res.json({
       token: token,
     });
@@ -54,16 +64,11 @@ function signinpHandler(req, res) {
       message: "Invalid",
     });
   }
-}
+});
 
-function authorization(req, res) {
-  const token = req.headers.token;
-
-  const decodedInformation = jwt.verify(token, JWT_SECRET); //{It stores username: aditya1221}
-  const username = decodedInformation.username;
-
+app.get("/me", function (req, res) {
   const foundUser = database.find(function (u) {
-    if (u.username === username) {
+    if (u.username === req.username) {
       return true;
     } else {
       return false;
@@ -75,15 +80,7 @@ function authorization(req, res) {
       username: foundUser.username,
       password: foundUser.password,
     });
-  } else {
-    res.send({
-      message: "Invalid Token",
-    });
   }
-}
-
-app.post("/signup", signupHandler);
-app.post("/signin", signinpHandler);
-app.get("/me", authorization);
+});
 
 app.listen(3000);
