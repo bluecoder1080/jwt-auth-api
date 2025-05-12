@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auth Website</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+  </head>
+  <body style="font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px;">
+
+    <div style="max-width: 400px; margin: auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+      <h2 style="text-align:center;">Signup</h2>
+      <input type="text" id="signup-username" name="username" placeholder="Username" style="width: 100%; padding: 10px; margin: 5px 0;" />
+      <input type="password" id="signup-password" name="password" placeholder="Password" style="width: 100%; padding: 10px; margin: 5px 0;" />
+      <button onclick="signup()" style="width: 100%; padding: 10px; background-color: green; color: white; border: none; margin-top: 10px;">Submit</button>
+    </div>
+
+    <div style="max-width: 400px; margin: auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+      <h2 style="text-align:center;">Signin</h2>
+      <input type="text" id="signin-username" name="username" placeholder="Username" style="width: 100%; padding: 10px; margin: 5px 0;" />
+      <input type="password" id="signin-password" name="password" placeholder="Password" style="width: 100%; padding: 10px; margin: 5px 0;" />
+      <button onclick="signin()" style="width: 100%; padding: 10px; background-color: blue; color: white; border: none; margin-top: 10px;">Submit</button>
+    </div>
+
+    <div style="max-width: 400px; margin: auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+      <h2>User Information</h2>
+      <div id="information" style="color: #333;"></div>
+    </div>
+
+    <div style="text-align: center;">
+      <button onclick="logout()" style="padding: 10px 20px; background-color: red; color: white; border: none; border-radius: 5px;">Logout</button>
+    </div>
+
+    <script>
+      async function signup() {
+        const username = document.getElementById("signup-username").value;
+        const password = document.getElementById("signup-password").value;
+        await axios.post("http://localhost:3000/signup", {
+          username: username,
+          password: password,
+        });
+        alert("You Are Signed Up 🔥🔥 !!");
+      }
+
+      async function signin() {
+        const username = document.getElementById("signin-username").value;
+        const password = document.getElementById("signin-password").value;
+        const response = await axios.post("http://localhost:3000/signin", {
+          username: username,
+          password: password,
+        });
+        localStorage.setItem("token", response.data.token);
+        alert("You Are Signed In !! 🔥🔥");
+        getUserInformation();
+      }
+
+      async function getUserInformation() {
+        const response = await axios.get("http://localhost:3000/me", {
+          headers: {
+            token: localStorage.getItem("token"),
+          },
+        });
+        document.getElementById("information").innerHTML =
+          "Username: " +
+          response.data.username +
+          "<br>Password: " +
+          response.data.password;
+      }
+
+      function logout() {
+        localStorage.removeItem("token");
+        document.getElementById("information").innerHTML = "";
+        alert("Logged Out Successfully.");
+      }
+    </script>
+  </body>
+</html>
