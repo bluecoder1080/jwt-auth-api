@@ -6,29 +6,133 @@
     <title>Auth Website</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
   </head>
-  <body style="font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px;">
-
-    <div style="max-width: 400px; margin: auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
-      <h2 style="text-align:center;">Signup</h2>
-      <input type="text" id="signup-username" name="username" placeholder="Username" style="width: 100%; padding: 10px; margin: 5px 0;" />
-      <input type="password" id="signup-password" name="password" placeholder="Password" style="width: 100%; padding: 10px; margin: 5px 0;" />
-      <button onclick="signup()" style="width: 100%; padding: 10px; background-color: green; color: white; border: none; margin-top: 10px;">Submit</button>
+  <body
+    style="
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      padding: 20px;
+    "
+  >
+    <div
+      style="
+        max-width: 400px;
+        margin: auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      "
+    >
+      <h2 style="text-align: center">Signup</h2>
+      <input
+        type="text"
+        id="signup-username"
+        name="username"
+        placeholder="Username"
+        style="width: 100%; padding: 10px; margin: 5px 0"
+      />
+      <input
+        type="password"
+        id="signup-password"
+        name="password"
+        placeholder="Password"
+        style="width: 100%; padding: 10px; margin: 5px 0"
+      />
+      <button
+        onclick="signup()"
+        style="
+          width: 100%;
+          padding: 10px;
+          background-color: green;
+          color: white;
+          border: none;
+          margin-top: 10px;
+        "
+      >
+        Submit
+      </button>
     </div>
 
-    <div style="max-width: 400px; margin: auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
-      <h2 style="text-align:center;">Signin</h2>
-      <input type="text" id="signin-username" name="username" placeholder="Username" style="width: 100%; padding: 10px; margin: 5px 0;" />
-      <input type="password" id="signin-password" name="password" placeholder="Password" style="width: 100%; padding: 10px; margin: 5px 0;" />
-      <button onclick="signin()" style="width: 100%; padding: 10px; background-color: blue; color: white; border: none; margin-top: 10px;">Submit</button>
+    <div
+      style="
+        max-width: 400px;
+        margin: auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      "
+    >
+      <h2 style="text-align: center">Signin</h2>
+      <input
+        type="text"
+        id="signin-username"
+        name="username"
+        placeholder="Username"
+        style="width: 100%; padding: 10px; margin: 5px 0"
+      />
+      <input
+        type="password"
+        id="signin-password"
+        name="password"
+        placeholder="Password"
+        style="width: 100%; padding: 10px; margin: 5px 0"
+      />
+      <button
+        onclick="signin()"
+        style="
+          width: 100%;
+          padding: 10px;
+          background-color: blue;
+          color: white;
+          border: none;
+          margin-top: 10px;
+        "
+      >
+        Submit
+      </button>
     </div>
 
-    <div style="max-width: 400px; margin: auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    <div
+      style="
+        max-width: 400px;
+        margin: auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      "
+    >
       <h2>User Information</h2>
-      <div id="information" style="color: #333;"></div>
+      <div id="information" style="color: #333"></div>
     </div>
 
-    <div style="text-align: center;">
-      <button onclick="logout()" style="padding: 10px 20px; background-color: red; color: white; border: none; border-radius: 5px;">Logout</button>
+    <div style="text-align: center">
+      <button
+        onclick="logout()"
+        style="
+          padding: 10px 20px;
+          background-color: red;
+          color: white;
+          border: none;
+          border-radius: 5px;
+        "
+      >
+        Logout
+      </button>
+    </div>
+
+    <div>
+      <h2>Add TODO</h2>
+      <input type="text" id="title" placeholder="Title" />
+      <input type="text" id="description" placeholder="Description" />
+      <button onclick="addTodo()">Add</button>
+
+      <h2>Your TODOs</h2>
+      <div id="todo-list"></div>
     </div>
 
     <script>
@@ -71,6 +175,74 @@
         localStorage.removeItem("token");
         document.getElementById("information").innerHTML = "";
         alert("Logged Out Successfully.");
+      }
+
+      async function addTodo() {
+        const title = document.getElementById("title").value;
+        const description = document.getElementById("description").value;
+
+        await axios.post(
+          "http://localhost:3000/todo",
+          {
+            title: title,
+            description: description,
+          },
+          {
+            headers: {
+              token: localStorage.getItem("token"),
+            },
+          }
+        );
+        getTodos();
+      }
+
+      async function getTodos() {
+        const res = await axios.get("http://localhost:3000/todos", {
+          headers: {
+            token: localStorage.getItem("token"),
+          },
+        });
+
+        const list = document.getElementById("todo-list");
+        list.innerHTML = "";
+
+        res.data.forEach((todo) => {
+          const div = document.createElement("div");
+          div.innerHTML = `
+      <b>${todo.title}</b>: ${todo.description}
+      ${todo.completed ? "✅" : ""}
+      <button onclick="markDone(${todo.id})">Done</button>
+      <button onclick="deleteTodo(${todo.id})">Delete</button>
+    `;
+          list.appendChild(div);
+        });
+      }
+
+      async function markDone(id) {
+        await axios.put(
+          `http://localhost:3000/todo/${id}`,
+          {},
+          {
+            headers: {
+              token: localStorage.getItem("token"),
+            },
+          }
+        );
+        getTodos();
+      }
+
+      async function deleteTodo(id) {
+        await axios.delete(`http://localhost:3000/delete/${id}`, {
+          headers: {
+            token: localStorage.getItem("token"),
+          },
+        });
+        getTodos();
+      }
+
+      // Auto load if already logged in
+      if (localStorage.getItem("token")) {
+        getMe();
       }
     </script>
   </body>
